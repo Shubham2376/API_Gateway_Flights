@@ -5,5 +5,6 @@ dotenv.config()
 // after this all of your environment variable was loaded inside this object process.env
 
 module.exports = {
-    PORT : process.env.PORT
+    PORT : process.env.PORT,
+    SALT_ROUNDS : process.env.SALT_ROUNDS
 }
