@@ -28,6 +28,29 @@ async function signup(req,res){
                 .json(ErrorResponse)
     }
 }
+
+async function signin(req,res){
+    try{
+        console.log("Inside Controller")
+        const user = await UserService.signin({
+            email : req.body.email,
+            password: req.body.password
+        });
+        SuccessResponse.data = user;
+        return res
+                .status(StatusCodes.CREATED)
+                .json(SuccessResponse)
+    }
+    catch(error){
+        console.log("hi");
+        //console.log(error)
+        ErrorResponse.error = error
+        return res
+                .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+                .json(ErrorResponse)
+    }
+}
 module.exports = {
-    signup
+    signup,
+    signin
 }
