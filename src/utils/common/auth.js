@@ -25,6 +25,7 @@ function verifyToken(token){
         return jwt.verify(token,severconfig.JWT_SECRET);
     }
     catch(err){
+        console.log(err);
         throw err;
     }
 }
