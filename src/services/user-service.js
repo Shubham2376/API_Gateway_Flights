@@ -46,7 +46,30 @@ async function signin(data){
         throw new AppError('something went wrong',StatusCodes.INTERNAL_SERVER_ERROR);
     }
 }
+async function isAuthenticated(token){
+    try{
+        if(!token){
+            throw new AppError('Missing JWT token',StatusCodes.BAD_REQUEST)
+        }
+        const response = Auth.verifyToken(token); //you see that in response you have id and email coming up
+        // you put one more level of check also that you have id now lets also verify this user once because there maybe the case like that user generate the jwt they lost the token and somehow the user account was not deleted but the other person still try to mimic as a user 
+        const user = userRepo.get(response.id);
+        if(!user){
+            throw new AppError('User not found',StatusCodes.NOT_FOUND);
+        }
+        return user.id;
+
+    }
+    catch(error){
+        if(error instanceof AppError) throw error;
+        if(error.name == 'JsonWebTokenError'){
+            throw new AppError('Invalid JWT token',StatusCodes.BAD_REQUEST)
+        }
+        throw new AppError('something went wrong',StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
 module.exports = {
     create,
-    signin
+    signin,
+    isAuthenticated
 }

@@ -12,6 +12,7 @@ function checkPassword(plainPassword, encryptedPassword){
 }
 function createToken(input){
     try{
+        // we use sign token identity mechanism here 
         return jwt.sign(input,severconfig.JWT_SECRET,{expiresIn:severconfig.JWT_EXPIRY})
     }
     catch(Error){
@@ -19,7 +20,16 @@ function createToken(input){
         throw Error;
     }
 }
+function verifyToken(token){
+    try{
+        return jwt.verify(token,severconfig.JWT_SECRET);
+    }
+    catch(err){
+        throw err;
+    }
+}
 module.exports = {
     checkPassword,
-    createToken
+    createToken,
+    verifyToken
 }

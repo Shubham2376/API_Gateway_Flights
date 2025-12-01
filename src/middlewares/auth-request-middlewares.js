@@ -1,6 +1,7 @@
 const {StatusCodes} = require("http-status-codes");
 const {ErrorResponse} = require('../utils/common');
 const AppError = require("../utils/errors/app-error");
+const {UserService} = require('../services')
 function validateAuthRequest(req,res,next){
 
     if(!req.body.email){
@@ -21,6 +22,26 @@ function validateAuthRequest(req,res,next){
     }
     next();
 }
+
+async function checkAuth(req,res,next){
+    try{
+        const response = await UserService.isAuthenticated(req.headers['x-access-token']); //from the service you returing the id 
+        if(response){
+            // before calling next middleware what you can do that inside your req object you can do one simple thing that you add new key user and set that as response which was user-id
+            // if the user was authenticated then the any api that we internally implemented can actually access the user id directly from req.user
+            // you check the auth and somehow you routed into your booking service then in that point of time how you know that which user making a booking either you manually set the user id or in a req object i can check is the req.user parameter filled that means we already access user id and user is authenticated so this is going to be signifer for down stream api that incoming user was authenticated and incoming request was authentcated 
+            req.user = response; //setting the user id in the req body
+        }
+        next();
+    }
+    catch(err){
+         return res
+                .status(err.statusCode)
+                .json(err)
+    }
+}
+
 module.exports = {
-    validateAuthRequest
+    validateAuthRequest,
+    checkAuth
 }
