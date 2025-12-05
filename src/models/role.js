@@ -2,6 +2,9 @@
 const {
   Model
 } = require('sequelize');
+const {Enums} = require('../utils/common');
+// lets destructure USER_ROLES_ENUMS from Enums
+const {ADMIN,CUSTOMER,FLIGHT_COMPANY} = Enums.USER_ROLES_ENUMS;
 module.exports = (sequelize, DataTypes) => {
   class Role extends Model {
     /**
@@ -11,10 +14,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsToMany(models.User,{through:'User_Roles',as:'user'})
     }
   }
   Role.init({
-    name: DataTypes.STRING
+    name: {
+      // i define a type as enum
+     type: DataTypes.ENUM({
+      values:[ADMIN,CUSTOMER,FLIGHT_COMPANY]
+     }),
+     allowNull: false,
+     defaultValue: CUSTOMER
+    }
   }, {
     sequelize,
     modelName: 'Role',
