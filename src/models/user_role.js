@@ -14,11 +14,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User_Role.init({
-    user_id: {
+    // userId should be in camel case otherwise error will came 
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    role_id: {
+    // roleId should be in camel case otherwise error will came
+    roleId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     }

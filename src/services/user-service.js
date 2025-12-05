@@ -1,13 +1,17 @@
-const {UserRepository} = require('../repositories');
+const {UserRepository,RoleRepository} = require('../repositories');
 const {StatusCodes}= require('http-status-codes')
 const userRepo = new UserRepository(); //we make object userRepo from UserRepository class
+const roleRepo = new RoleRepository();
 const AppError = require('../utils/errors/app-error')
 const bcrypt = require('bcrypt');
-const {Auth} = require('../utils/common')
+const {Auth,Enums} = require('../utils/common')
 async function create(data){
     try{
         console.log("Inside Services") 
         const user = await userRepo.create(data);
+        // when we signup either in that time we give role name, generally what will happen that any user signup as normal customer then via a admin only you should able to give a role you might think that once in time admin need to be signin so generally what will happen that admin role directly assigned to database you can see the admin role you don't need to setup api call for admin role so when one admin assign then that admin give role to other admin and so on
+        const role = await roleRepo.getRoleByName(Enums.USER_ROLES_ENUMS.CUSTOMER);
+        user.addRole(role);
         return user;
     }
     catch(error){
