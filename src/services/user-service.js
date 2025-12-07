@@ -55,9 +55,9 @@ async function isAuthenticated(token){
         if(!token){
             throw new AppError('Missing JWT token',StatusCodes.BAD_REQUEST)
         }
-        const response = Auth.verifyToken(token); //you see that in response you have id and email coming up
+        const response =Auth.verifyToken(token); //you see that in response you have id and email coming up
         // you put one more level of check also that you have id now lets also verify this user once because there maybe the case like that user generate the jwt they lost the token and somehow the user account was not deleted but the other person still try to mimic as a user 
-        const user = userRepo.get(response.id);
+        const user = await userRepo.get(response.id);
         if(!user){
             throw new AppError('User not found',StatusCodes.NOT_FOUND);
         }
@@ -75,8 +75,47 @@ async function isAuthenticated(token){
         throw new AppError('something went wrong',StatusCodes.INTERNAL_SERVER_ERROR);
     }
 }
+async function addRoletoUser(data){
+    try{
+        const user = await userRepo.get(data.id);
+        if(!user){
+            throw new AppError('No user found for the given id',StatusCodes.NOT_FOUND);
+        }
+        const role = await roleRepo.getRoleByName(data.role);
+        if(!role){
+            throw new AppError('No user found for the given role',StatusCodes.NOT_FOUND);
+        }
+        user.addRole(role);
+        return user;
+    }
+    catch(err){
+        if(err instanceof AppError) throw err
+        console.log(err);
+        throw new AppError('something went wrong',StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+async function isAdmin(id){
+     try{
+        const user = await userRepo.get(id);
+        if(!user){
+            throw new AppError('No user found for the given id',StatusCodes.NOT_FOUND);
+        }
+        const adminRole = await roleRepo.getRoleByName(Enums.USER_ROLES_ENUMS.ADMIN);
+        if(!adminRole){
+            throw new AppError('No user found for the given role',StatusCodes.NOT_FOUND);
+        }
+        return user.hasRole(adminRole);
+    }
+    catch(err){
+        if(err instanceof AppError) throw err
+        console.log(err);
+        throw new AppError('something went wrong',StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
 module.exports = {
     create,
     signin,
-    isAuthenticated
+    isAuthenticated,
+    addRoletoUser,
+    isAdmin
 }

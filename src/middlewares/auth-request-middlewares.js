@@ -40,8 +40,21 @@ async function checkAuth(req,res,next){
                 .json(err)
     }
 }
+async function isAdmin(req,res,next){
+    // first of all we have to check that user was signed in or not because if you are not signed in you can't allocate role to someone else and then you need to check it that whoseever was signed in are they admin or not
+        // when we do user authenticated we set user property on req body isAuthenticated return the user.id 
+        const response = await UserService.isAdmin(req.user);
+        if(!response){
+            return res
+                .status(StatusCodes.UNAUTHORIZED)
+                .json({message:"user not authorized for this action"});
+        }
+        next();
+
+}
 
 module.exports = {
     validateAuthRequest,
-    checkAuth
+    checkAuth,
+    isAdmin
 }
